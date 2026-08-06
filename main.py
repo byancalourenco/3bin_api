@@ -1,19 +1,26 @@
-# importanção do FastAPI
-from fastapi import FastAPI
+# main.py
 
-# criação da aplicação
+#importando os arquivos
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from database import Base, engine, get_db
+from models import ProdutoDB
+from schemas import ProdutoCreate, ProdutoResponse
+
+Base.metadata.create_all(bind=engine) # cria as tabelas, se ainda não existirem
 app = FastAPI()
 
-# criação de rota
-@app.get("/")
-def Raiz():
-    return {"mensagem": "Minha primeira API em FastAPI!"}
+# get -  retorna uma lista
+@app.get('/produtos', response_model=list[ProdutoResponse])
+def listar_produtos(db: Session = Depends(get_db)):
+    #  select * from produtos
+    return db.query(ProdutoDB).all()
 
-# outra rota
-@app.get("/clientes")
-def Clientes():
-    return {"mensagem": "Lista de clientes"}
-
-
-# @ - decorator
-# objeto, método, URL, função
+# post
+@app.post('/produtos', response_model=ProdutoResponse, status_code=201)
+def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
+    novo_produto = ProdutoDB(**produto.dict())
+    db.add(novo_produto)
+    db.commit()
+    db.refresh(novo_produto)
+    return novo_produto
