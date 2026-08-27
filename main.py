@@ -9,6 +9,9 @@ from schemas import ProdutoCreate, ProdutoResponse
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from models from FilmesDB
+from schemas import FilmesCreate, FilmesResponse
+
 
 Base.metadata.create_all(bind=engine) # cria as tabelas, se ainda não existirem
 app = FastAPI()
@@ -68,3 +71,53 @@ def atualizar_produto(produto_id: int, dados: ProdutoCreate, db: Session = Depen
     db.commit()
     db.refresh(produto)
     return produto    
+
+
+# atividade 2
+
+# get
+@app.get('/filmes', response_model=list[FilmesResponse])
+def listar_filmes(db: Session = Depends(get_db)):
+    return db.query(FilmesDB).all()
+
+
+# get
+@app.get('/filmes/{produto_id}', response_model=FilmesResponse)
+def obter_filme(filmes_id: int, db: Session = Depends(get_db)):
+    filmes = db.query(FilmesDB).filter(FilmesDB.id == filmes_id).first()
+    if filmes is None:
+        raise HTTPException(status_code=404, detail='Filme não encontrado')
+    return filmes
+
+# post
+@app.post('/filmes', response_model=FilmesResponse, status_code=201)
+def criar_filme(filmes: FilmesCreate, db: Session = Depends(get_db)):
+    novo_filme = FilmesDB(**filmes.dict()) 
+    db.add(novo_filme) 
+    db.commit()
+    db.refresh(novo_filme)
+    return novo_filme
+
+# delete
+@app.delete('/filmes/{filmes_id}', status_code=204)
+def remover_filme(filmes_id: int, db: Session = Depends(get_db)):
+    filmes = db.query(FilmesDB).filter(FilmesDB.id == filmes_id).first()
+    if filmes is None:
+        raise HTTPException(status_code=404, detail='Filme não encontrado')
+    db.delete(filmes)
+    db.commit()
+    return HTTPException(status_code=204, detail='Filme deletado com sucesso')
+
+# put
+@app.put('/filmes/{filmes_id}', response_model=FilmesResponse)
+def atualizar_filme(filmes_id: int, dados: FilmesCreate, db: Session = Depends(get_db)):
+    filmes = db.query(FilmesDB).filter(FilmesDB.id == filmes_id).first()
+    if filmes is None:
+        raise HTTPException(status_code=404, detail='Filme não encontrado')
+    filmes.titulo = dados.titulo
+    filmes.diretor = dados.diretor
+    filmes.genero = dados.genero
+    filmes.duracao = dados.duracao
+    db.commit()
+    db.refresh(filmes)
+    return filmes 
