@@ -16,7 +16,11 @@ class ProdutoResponse(ProdutoBase):
  id: int
 
 
-# atividade 2
+ # obrigatorio
+class Config:
+    from_attributes = True
+
+#  atividade 2 
 
 class FilmesBase(BaseModel):
     titulo: str
@@ -30,6 +34,3 @@ class FilmesCreate(FilmesBase):
 class FilmesResponse(FilmesBase):
     id: int
 
-# obrigatorio
-class Config:
-    from_attributes = True

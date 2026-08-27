@@ -6,11 +6,16 @@ from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 from models import ProdutoDB
 from schemas import ProdutoCreate, ProdutoResponse
+
+# imports para a atividade 2 
+from models import FilmesDB
+from schemas import FilmesCreate, FilmesResponse
+
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from models from FilmesDB
-from schemas import FilmesCreate, FilmesResponse
+
+
 
 
 Base.metadata.create_all(bind=engine) # cria as tabelas, se ainda não existirem
@@ -75,6 +80,7 @@ def atualizar_produto(produto_id: int, dados: ProdutoCreate, db: Session = Depen
 
 # atividade 2
 
+
 # get
 @app.get('/filmes', response_model=list[FilmesResponse])
 def listar_filmes(db: Session = Depends(get_db)):
@@ -120,4 +126,4 @@ def atualizar_filme(filmes_id: int, dados: FilmesCreate, db: Session = Depends(g
     filmes.duracao = dados.duracao
     db.commit()
     db.refresh(filmes)
-    return filmes 
+    return filmes  
