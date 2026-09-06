@@ -88,7 +88,7 @@ def listar_filmes(db: Session = Depends(get_db)):
 
 
 # get
-@app.get('/filmes/{produto_id}', response_model=FilmesResponse)
+@app.get('/filmes/{filmes_id}', response_model=FilmesResponse)
 def obter_filme(filmes_id: int, db: Session = Depends(get_db)):
     filmes = db.query(FilmesDB).filter(FilmesDB.id == filmes_id).first()
     if filmes is None:
